@@ -1,0 +1,2 @@
+module controls.initControl;
+

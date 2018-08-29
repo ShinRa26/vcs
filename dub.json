@@ -1,0 +1,9 @@
+{
+	"name": "vcs",
+	"authors": [
+		"Graham Keenan"
+	],
+	"description": "Version Control",
+	"copyright": "Copyright © 2018, Graham Keenan",
+	"license": "BSD"
+}

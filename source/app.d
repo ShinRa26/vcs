@@ -10,6 +10,7 @@ void parseArguments(string[] cmdLineArgs) {
             break;
         case "add":
 			import controls.addControl;
+            AddControl add = AddControl(cmdLineArgs[1..$]);
             break;
         case "commit":
             break;

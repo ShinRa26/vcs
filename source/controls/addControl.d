@@ -10,6 +10,6 @@ struct AddControl {
     
     this(string[] args) {
         this.args = args;
-        this.vcsDirectory = vcs.utils.findRootDirectory();
+        this.vcsDirectory = findRootDirectory();
     }
 }

@@ -1,6 +1,8 @@
 module vcs.utils;
 
 import std.stdio : writefln;
+import std.file;
+import std.path;
 
 void VCSMessage(string msg) {
     writefln("VCS::%s", msg);

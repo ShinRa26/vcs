@@ -10,13 +10,6 @@ struct AddControl {
     
     this(string[] args) {
         this.args = args;
-        this.vcsDirectory = findRootDirectory();
-    }
-
-    string findRootDirectory() {
-        string cwd = getcwd();
-
-        /// TODO::Find .vcs folder
-        return cwd;
+        this.vcsDirectory = vcs.utils.findRootDirectory();
     }
 }

@@ -6,4 +6,11 @@ void VCSMessage(string msg) {
     writefln("VCS::%s", msg);
 }
 
+string findRootDirectory() {
+        string cwd = getcwd();
+
+        /// TODO::Find .vcs folder
+        return cwd;
+    }
+
 /* Other Utilities if I can be arsed */

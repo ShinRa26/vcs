@@ -14,3 +14,4 @@ vcs-test-*
 *.lst
 vcs
 vcs.exe
+.vcs/

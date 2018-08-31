@@ -6,6 +6,20 @@ import vcs.utils;
 import controls.vcsFile;
 import std.string : endsWith;
 
+
+/***
+* Storing files
+* 
+* Read the content:
+*   Compress and encode data
+*   Calculate hash of content
+*   Use that hash as the filename
+*   Write out data to file with that name
+* 
+* TODO::Figure out how to determine which files have been added before
+* Maybe snapshot project at first then work out a solution...
+**/
+
 struct CommitControl {
     string[] args;
     string rootDir;
@@ -13,7 +27,7 @@ struct CommitControl {
     
     this(string[] args) {
         this.args = args;
-        this.rootDir = findRootDirectory(getcwd());
+        this.rootDir = findVCSDirectory(getcwd());
     }
     
     void parseArgs() {
@@ -28,16 +42,5 @@ struct CommitControl {
                 /// Individual files
                 break;
         }
-    }
-
-    /// TODO::Need to know when we're not in a repo...
-    string findRootDirectory(string path) {
-        foreach(string p; dirEntries(path, SpanMode.breadth)) {
-            if(p.endsWith(".vcs")) {
-                VCSMessage(p);
-                return p;
-            }
-        }
-        return findRootDirectory(buildPath(path, ".."));
     }
 }

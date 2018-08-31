@@ -12,6 +12,8 @@ vcs-test-*
 *.o
 *.obj
 *.lst
+
 vcs
 vcs.exe
 .vcs/
+.vcsConfig

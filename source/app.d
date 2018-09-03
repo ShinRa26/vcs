@@ -17,6 +17,9 @@ void parseArguments(string[] cmdLineArgs) {
             break;
         case "revert":
             break;
+        case "debug":
+            debugSystem();
+            break;
         default:
 			auto msg = format!"Unknown command: %s\n"(initialArg);
             VCSMessage(msg);

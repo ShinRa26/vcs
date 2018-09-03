@@ -43,7 +43,7 @@ struct Snapshot {
             case "-A":
                 /// Everything from the root downwards
                 this.allFiles = true;
-                fromDirectory(this.rootDir);
+                fromDirectory(dirName(this.rootDir));
                 break;
             default:
                 /// Individual files
@@ -91,7 +91,7 @@ struct Snapshot {
     }
 
     /// Ugly implementation
-    /// TODO::Fix
+    /// TODO::Fix this crock of shit
     bool contentChanged() {
         int pathCounter;
         VCSFile[] newStage;
@@ -104,7 +104,8 @@ struct Snapshot {
                 
                 foreach(VCSFile f; this.stage) {
                     if(f.filename == originalName && f.shaContents != baseName(path)) {
-                        newStage ~= f;                
+                        newStage ~= f;
+                        break;            
                     }
                 }
             }

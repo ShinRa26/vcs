@@ -9,8 +9,21 @@ import core.stdc.stdlib : exit;
 import std.uuid : randomUUID;
 import std.array : replace;
 
-void VCSMessage(string msg) {
-    writefln("VCS::%s", msg);
+void VCSMessage(string msg, int flag = 0) {
+    switch(flag) {
+        case 0:
+            writefln("VCS::%s", msg);
+            break;
+        case 1:
+            writefln("VCS::DEBUG::%s", msg);
+            break;
+        case 2:
+            writefln("VCS::FATAL::%s", msg);
+            break;
+        default:
+            break;
+
+    }
 }
 
 /// TODO::Find a better way to search for the project root...
@@ -41,5 +54,13 @@ void writeFile(string name, string contents, string flag = "wb") {
     auto f = File(name, flag);
     f.write(contents);
     f.close();
+}
+
+void debugSystem() {
+    import std.file;
+
+    string path = "D:\\Projects\\D\\vcs\\.vcs";
+    VCSMessage("Initialising debug", 1);
+    VCSMessage(path, 1);
 }
 /* Other Utilities if I can be arsed */

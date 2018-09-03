@@ -5,11 +5,13 @@ import std.path;
 import std.zlib;
 import vcs.utils;
 import std.base64;
+import std.digest.sha;
 import std.format : format;
 
 struct VCSFile {
     string filename;
     ubyte[] contents;
+    string shaContents;
 
     this(string filename) {
         this.filename = absolutePath(filename);
@@ -20,8 +22,7 @@ struct VCSFile {
             this.contents = null;
         } else {
             this.contents = zLibCompressAndEncode();
-            auto msg = format!"Create VCSFile: \"%s\""(this.filename);
-            VCSMessage(msg);
+            string x;
         }
     }
 
@@ -30,6 +31,8 @@ struct VCSFile {
         ubyte[] compressed = compress(data);
         ubyte[] encoded = cast(ubyte[])Base64.encode(compressed);
 
-        return data;
+        ubyte[] sha = sha1Of(data);
+        this.shaContents = toHexString(sha);
+        return encoded;
     }   
 }

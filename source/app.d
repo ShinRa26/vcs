@@ -10,9 +10,10 @@ void parseArguments(string[] cmdLineArgs) {
 			import controls.initControl;
             initDirectory(cmdLineArgs[1..$]);
             break;
-        case "commit":
-			import controls.commitControl;
-            auto commitControl = CommitControl(cmdLineArgs[1..$]);
+        case "snapshot":
+			import controls.snapshot;
+            auto snap = Snapshot(cmdLineArgs[1..$]);
+            snap.parseArgs();
             break;
         case "revert":
             break;

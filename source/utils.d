@@ -1,11 +1,13 @@
 module vcs.utils;
 
-import std.stdio : writefln;
+import std.stdio : writefln, File;
 import std.file;
 import std.path;
 import std.string : endsWith;
 import std.format : format;
 import core.stdc.stdlib : exit;
+import std.uuid : randomUUID;
+import std.array : replace;
 
 void VCSMessage(string msg) {
     writefln("VCS::%s", msg);
@@ -20,7 +22,7 @@ string findVCSDirectory(string path) {
                 return p;
             }
         }
-        return findRootDirectory(buildPath(path, ".."));
+        return findVCSDirectory(buildPath(path, ".."));
 
     } catch(Exception) {
         auto msg = format!"Maximum search depth reached (%s): Permission Denied (Is this a valid repository?)"(path);
@@ -30,4 +32,15 @@ string findVCSDirectory(string path) {
     }
 }
 
+
+string createRandomUUID() {
+    string uuid = randomUUID().toString().replace("-", "");
+    return cast(string)uuid[0..8];
+}
+
+void writeFile(string name, string contents, string flag = "wb") {
+    auto f = File(name, flag);
+    f.write(contents);
+    f.close();
+}
 /* Other Utilities if I can be arsed */

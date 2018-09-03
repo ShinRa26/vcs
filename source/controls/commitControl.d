@@ -68,40 +68,56 @@ struct Snapshot {
 
     void writeCommit() {
         string commitDirectory = buildPath(this.rootDir, createRandomUUID());
-        mkdir(commitDirectory);
 
-        /// Check for file changes
+        /// Check for file changes 
         /// If allFiles set, don't check
         if(!this.allFiles) {
-            checkContentChange();
+            if(!contentChanged()) {
+                VCSMessage("No changes detected, nothing to commit.");
+                return;
+            }
         }
 
+        mkdir(commitDirectory);
         foreach(VCSFile x; this.stage) {
             string savePath = buildPath(commitDirectory, x.shaContents);
             string contents = format!"Filepath: %s\n\n%s"(x.filename, cast(string)x.contents);
+
+            auto msg = format!"Created VCSFile: %s"(baseName(x.filename));
+            VCSMessage(msg);
 
             writeFile(savePath, contents);
         }
     }
 
-    void checkContentChange() {
+    /// Ugly implementation
+    /// TODO::Fix
+    bool contentChanged() {
+        int pathCounter;
         VCSFile[] newStage;
         VCSMessage("Checking for content changes...");
 
-        foreach(string path; dirEntries(this.rootDir, SpanMode.breadth)) {
+        foreach(string path; dirEntries(this.rootDir, SpanMode.depth)) {
             if(isFile(path)) {
                 string content = cast(string)read(path);
-                content = content.split("\n\n")[0].split(": ")[1];
+                string originalName = content.split("\n\n")[0].split(": ")[1];
                 
                 foreach(VCSFile f; this.stage) {
-                    if(f.filename == content && f.shaContents != baseName(path)) {
+                    if(f.filename == originalName && f.shaContents != baseName(path)) {
                         newStage ~= f;                
                     }
                 }
             }
+            pathCounter++;
         }
 
-        if(newStage.length != 0)
+        if(newStage.length != 0) {
             this.stage = newStage;
+            return true;
+        } else if(pathCounter == 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 }

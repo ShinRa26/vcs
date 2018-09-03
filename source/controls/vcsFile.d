@@ -28,11 +28,13 @@ struct VCSFile {
 
     ubyte[] zLibCompressAndEncode() {
         ubyte[] data = cast(ubyte[])std.file.read(this.filename);
+        
+        ubyte[] sha = sha1Of(data);
+        this.shaContents = toHexString(sha);
+
         ubyte[] compressed = compress(data);
         ubyte[] encoded = cast(ubyte[])Base64.encode(compressed);
 
-        ubyte[] sha = sha1Of(data);
-        this.shaContents = toHexString(sha);
         return encoded;
     }   
 }

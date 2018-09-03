@@ -18,7 +18,6 @@ string findVCSDirectory(string path) {
     try {
         foreach(string p; dirEntries(path, SpanMode.breadth)) {
             if(p.endsWith(".vcs")) {
-                VCSMessage(p);
                 return p;
             }
         }

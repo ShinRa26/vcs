@@ -57,7 +57,7 @@ void writeFile(string name, string contents, string flag = "wb") {
 
 string[] parseIgnoreFile(string path) {
     string content = cast(string)read(path);
-    return content.split("\n");
+    return content.split("\r\n");
 }
 
 void debugSystem() {
@@ -74,6 +74,5 @@ void debugSystem() {
 
     VCSMessage("Initialising debug", 1);
     VCSMessage(path, 1);
-    // This is a comment
 }
 /* Other Utilities if I can be arsed */

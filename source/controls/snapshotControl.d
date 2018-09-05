@@ -1,15 +1,22 @@
 module controls.snapshot;
 
+/// Standard modules
 import std.file;
 import std.path;
+import std.format : format;
+import std.string : endsWith, split;
+import std.algorithm : canFind, find;
+
+/// Custom modules
 import vcs.utils;
 import controls.vcsFile;
-import std.algorithm : canFind;
-import std.string : endsWith, split;
-import std.digest.sha;
-import std.format : format;
 
+/// VCS Ignore filename
+const string vcsIgnoreFile = ".vcsIgnore";
 
+/**
+TODO::Document
+*/
 struct Snapshot {
     string[] args;
     string rootDir;
@@ -39,8 +46,8 @@ struct Snapshot {
     }
 
     void fromDirectory(string directory) {
-        /// TODO::Replace this with ignore file system
         foreach(string dir; dirEntries(directory, SpanMode.depth)) {
+            // VCSMessage(dir);
             if(isDir(dir) || toIgnore(dir)) {
                 continue;
             }
@@ -81,8 +88,11 @@ struct Snapshot {
     //     return false;
     // }
 
-    /// Ugly implementation
-    /// TODO::Fix this crock of shit
+    /**
+    * Needs reworked.
+    * Commits fine but duplicate commits a file that has already been committed if change is detected.
+    * TODO::Rework
+    */
     bool contentChanged() {
         int pathCounter;
         VCSFile[] newStage;
@@ -114,26 +124,36 @@ struct Snapshot {
     }
 
     bool toIgnore(string toCheck) {
-        string[] ignoreList = parseIgnoreFile(buildPath(dirName(this.rootDir), ".vcsIgnore"));
+        string[] ignoreList = parseIgnoreFile(buildPath(dirName(this.rootDir), vcsIgnoreFile));
+        
+        /// Search for matches
+        foreach(string ignore; ignoreList) {
+            /// Exact matches
+            if(canFind(toCheck, ignore)) {
+                return true;
+            }
 
-        /// Check if the file/dir is present to ignore
-        if(canFind(ignoreList, toCheck)) {
-            return true;
+            /// Search for wildcard entries
+            if(foundWildcard(toCheck, ignore)) {
+                return true;
+            }
         }
 
-        /// Check wildcard entries
-        foreach(string ignore; ignoreList) {
-            if(canFind(ignore, "*")) {
-                string split;
-                try{
-                    split = ignore.split("*")[0];
-                } catch(Exception) {
-                    split = ignore.split("*")[1];
-                }
+        return false;
+    }
 
-                if(canFind(split, toCheck)) {
-                    return true;
-                }
+    bool foundWildcard(string toCheck, string ignoreName) {
+        if(canFind(ignoreName, "*.")) {
+            /// Wildcard for file extensions
+            string ext = ignoreName.split(".")[1];
+            if(canFind(toCheck, ext)) {
+                return true;
+            }
+        } else if(canFind(ignoreName, ".*")) {
+            /// Wildcard for filenames
+            string fname = ignoreName.split(".")[0];
+            if(canFind(toCheck, fname)) {
+                return true;
             }
         }
 

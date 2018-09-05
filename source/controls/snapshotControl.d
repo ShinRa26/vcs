@@ -143,15 +143,17 @@ struct Snapshot {
     }
 
     bool foundWildcard(string toCheck, string ignoreName) {
+        string[] ignoreSplit = ignoreName.split(".");
+
         if(canFind(ignoreName, "*.")) {
             /// Wildcard for file extensions
-            string ext = ignoreName.split(".")[1];
+            string ext = ignoreSplit[1];
             if(canFind(toCheck, ext)) {
                 return true;
             }
         } else if(canFind(ignoreName, ".*")) {
             /// Wildcard for filenames
-            string fname = ignoreName.split(".")[0];
+            string fname = ignoreSplit[0];
             if(canFind(toCheck, fname)) {
                 return true;
             }

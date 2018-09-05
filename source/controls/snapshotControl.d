@@ -10,19 +10,6 @@ import std.digest.sha;
 import std.format : format;
 
 
-/***
-* Storing files
-* 
-* Read the content:
-*   Compress and encode data
-*   Calculate hash of content
-*   Use that hash as the filename
-*   Write out data to file with that name
-* 
-* TODO::Figure out how to determine which files have been added before
-* Maybe snapshot project at first then work out a solution...
-**/
-
 struct Snapshot {
     string[] args;
     string rootDir;
@@ -52,9 +39,9 @@ struct Snapshot {
     }
 
     void fromDirectory(string directory) {
+        /// TODO::Replace this with ignore file system
         foreach(string dir; dirEntries(directory, SpanMode.depth)) {
-            /// Ignore git files just in case...
-            if(isDir(dir) || canFind(dir, ".git") || canFind(dir, ".vcs")) {
+            if(isDir(dir) || toIgnore(dir)) {
                 continue;
             }
 
@@ -90,6 +77,10 @@ struct Snapshot {
         }
     }
 
+    // bool contentChanged() {
+    //     return false;
+    // }
+
     /// Ugly implementation
     /// TODO::Fix this crock of shit
     bool contentChanged() {
@@ -120,5 +111,32 @@ struct Snapshot {
         } else {
             return false;
         }
+    }
+
+    bool toIgnore(string toCheck) {
+        string[] ignoreList = parseIgnoreFile(buildPath(dirName(this.rootDir), ".vcsIgnore"));
+
+        /// Check if the file/dir is present to ignore
+        if(canFind(ignoreList, toCheck)) {
+            return true;
+        }
+
+        /// Check wildcard entries
+        foreach(string ignore; ignoreList) {
+            if(canFind(ignore, "*")) {
+                string split;
+                try{
+                    split = ignore.split("*")[0];
+                } catch(Exception) {
+                    split = ignore.split("*")[1];
+                }
+
+                if(canFind(split, toCheck)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

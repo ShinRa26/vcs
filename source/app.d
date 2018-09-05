@@ -10,7 +10,7 @@ void parseArguments(string[] cmdLineArgs) {
 			import controls.initControl;
             initDirectory(cmdLineArgs[1..$]);
             break;
-        case "snapshot":
+        case "snap":
 			import controls.snapshot;
             auto snap = Snapshot(cmdLineArgs[1..$]);
             snap.parseArgs();

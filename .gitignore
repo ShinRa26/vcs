@@ -17,3 +17,4 @@ vcs
 vcs.exe
 .vcs/
 .vcsConfig
+.vcsIgnore

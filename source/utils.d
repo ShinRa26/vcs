@@ -3,7 +3,7 @@ module vcs.utils;
 import std.stdio : writefln, File;
 import std.file;
 import std.path;
-import std.string : endsWith;
+import std.string : endsWith, split;
 import std.format : format;
 import core.stdc.stdlib : exit;
 import std.uuid : randomUUID;
@@ -12,13 +12,13 @@ import std.array : replace;
 void VCSMessage(string msg, int flag = 0) {
     switch(flag) {
         case 0:
-            writefln("VCS::%s", msg);
+            writefln("VCS::INFO:: - %s", msg);
             break;
         case 1:
-            writefln("VCS::DEBUG::%s", msg);
+            writefln("VCS::DEBUG:: - %s", msg);
             break;
         case 2:
-            writefln("VCS::FATAL::%s", msg);
+            writefln("VCS::FATAL:: - %s", msg);
             break;
         default:
             break;
@@ -26,7 +26,6 @@ void VCSMessage(string msg, int flag = 0) {
     }
 }
 
-/// TODO::Find a better way to search for the project root...
 string findVCSDirectory(string path) {
     try {
         foreach(string p; dirEntries(path, SpanMode.breadth)) {
@@ -40,7 +39,7 @@ string findVCSDirectory(string path) {
         auto msg = format!"Maximum search depth reached (%s): Permission Denied (Is this a valid repository?)"(path);
         VCSMessage(msg);
         exit(1);
-        return null; /// Shuts up the compiler
+        return ""; /// Shuts up the compiler
     }
 }
 
@@ -56,11 +55,25 @@ void writeFile(string name, string contents, string flag = "wb") {
     f.close();
 }
 
+string[] parseIgnoreFile(string path) {
+    string content = cast(string)read(path);
+    return content.split("\n");
+}
+
 void debugSystem() {
     import std.file;
+    string path = "";
 
-    string path = "D:\\Projects\\D\\vcs\\.vcs";
+    version(Windows) {
+        path = "D:\\Projects\\D\\vcs\\.vcs";
+    }
+
+    version(Posix) {
+        path = "/home/group/personal/d/vcs/.vcs";
+    }
+
     VCSMessage("Initialising debug", 1);
     VCSMessage(path, 1);
+    // This is a comment
 }
 /* Other Utilities if I can be arsed */

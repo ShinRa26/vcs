@@ -98,7 +98,7 @@ struct Snapshot {
     * Commits fine but duplicate commits a file that has already been committed if change is detected.
     * TODO::Rework
     */
-    // bool contentChanged() {
+    // bool contentChanged() {                                                                                                        
     //     int pathCounter;
     //     DVCSFile[] newStage;
     //     DVCSMessage("Checking for content changes...");

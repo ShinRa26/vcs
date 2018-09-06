@@ -1,4 +1,4 @@
-module vcs.utils;
+module dvcs.utils;
 
 import std.stdio : writefln, File;
 import std.file;
@@ -8,17 +8,19 @@ import std.format : format;
 import core.stdc.stdlib : exit;
 import std.uuid : randomUUID;
 import std.array : replace;
+import std.algorithm : canFind, find;
+import std.datetime.systime : SysTime, Clock;
 
-void VCSMessage(string msg, int flag = 0) {
+void DVCSMessage(string msg, int flag = 0) {
     switch(flag) {
         case 0:
-            writefln("VCS::INFO:: - %s", msg);
+            writefln("DVCS::INFO:: - %s", msg);
             break;
         case 1:
-            writefln("VCS::DEBUG:: - %s", msg);
+            writefln("DVCS::DEBUG:: - %s", msg);
             break;
         case 2:
-            writefln("VCS::FATAL:: - %s", msg);
+            writefln("DVCS::FATAL:: - %s", msg);
             break;
         default:
             break;
@@ -26,23 +28,22 @@ void VCSMessage(string msg, int flag = 0) {
     }
 }
 
-string findVCSDirectory(string path) {
+string findDVCSDirectory(string path) {
     try {
         foreach(string p; dirEntries(path, SpanMode.breadth)) {
-            if(p.endsWith(".vcs")) {
+            if(p.endsWith(".dvcs")) {
                 return p;
             }
         }
-        return findVCSDirectory(buildPath(path, ".."));
+        return findDVCSDirectory(buildPath(path, ".."));
 
     } catch(Exception) {
         auto msg = format!"Maximum search depth reached (%s): Permission Denied (Is this a valid repository?)"(path);
-        VCSMessage(msg);
+        DVCSMessage(msg);
         exit(1);
         return ""; /// Shuts up the compiler
     }
 }
-
 
 string createRandomUUID() {
     string uuid = randomUUID().toString().replace("-", "");
@@ -55,9 +56,63 @@ void writeFile(string name, string contents, string flag = "wb") {
     f.close();
 }
 
+void writeToConfig(string configFilename, string tag, string msg = "") {
+    SysTime currTime = Clock.currTime();
+    string timestamp = currTime.toString().split(".")[0];
+
+    string content = format!"\n[%s] -- %s %s\n"(tag, timestamp, msg);
+
+    writeFile(configFilename, content, "a");
+}
+
 string[] parseIgnoreFile(string path) {
     string content = cast(string)read(path);
-    return content.split("\r\n");
+
+    version(Windows) {
+        return content.split("\r\n");
+    }
+    version(Posix) {
+        return content.split("\n");
+    }
+}
+
+bool toIgnore(string ignoreFile, string toCheck) {
+    string[] ignoreList = parseIgnoreFile(ignoreFile);
+
+    /// Search for matches
+    foreach(string ignore; ignoreList) {
+        /// Exact matches
+        if(canFind(toCheck, ignore)) {
+            return true;
+        }
+
+        /// Search for wildcard entries
+        if(foundWildcard(toCheck, ignore)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool foundWildcard(string toCheck, string ignoreName) {
+    string[] ignoreSplit = ignoreName.split(".");
+
+    if(canFind(ignoreName, "*.")) {
+        /// Wildcard for file extensions
+        string ext = ignoreSplit[1];
+        if(canFind(toCheck, ext)) {
+            return true;
+        }
+    } else if(canFind(ignoreName, ".*")) {
+        /// Wildcard for filenames
+        string fname = ignoreSplit[0];
+        if(canFind(toCheck, fname)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void debugSystem() {
@@ -65,14 +120,14 @@ void debugSystem() {
     string path = "";
 
     version(Windows) {
-        path = "D:\\Projects\\D\\vcs\\.vcs";
+        path = "D:\\Projects\\D\\vcs\\.dvcs";
     }
 
     version(Posix) {
-        path = "/home/group/personal/d/vcs/.vcs";
+        path = "/home/group/personal/d/vcs/.dvcs";
     }
 
-    VCSMessage("Initialising debug", 1);
-    VCSMessage(path, 1);
+    DVCSMessage("Initialising debug", 1);
+    DVCSMessage(path, 1);
 }
 /* Other Utilities if I can be arsed */

@@ -1,4 +1,4 @@
-import vcs.utils;
+import dvcs.utils;
 import std.format : format;
 import std.stdio : writeln, writefln;
 
@@ -22,7 +22,7 @@ void parseArguments(string[] cmdLineArgs) {
             break;
         default:
 			auto msg = format!"Unknown command: %s\n"(initialArg);
-            VCSMessage(msg);
+            DVCSMessage(msg);
             break;
     }
 }

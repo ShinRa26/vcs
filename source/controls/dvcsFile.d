@@ -1,14 +1,14 @@
-module controls.vcsFile;
+module controls.dvcsFile;
 
 import std.file;
 import std.path;
 import std.zlib;
-import vcs.utils;
+import dvcs.utils;
 import std.base64;
 import std.digest.sha;
 import std.format : format;
 
-struct VCSFile {
+struct DVCSFile {
     string filename;
     ubyte[] contents;
     string shaContents;
@@ -18,7 +18,7 @@ struct VCSFile {
 
         if(!isFile(this.filename)) {
             string msg = format!"\"%s\" is not a valid file, skipping..."(this.filename);
-            VCSMessage(msg);
+            DVCSMessage(msg);
             this.contents = null;
         } else {
             this.contents = zLibCompressAndEncode();

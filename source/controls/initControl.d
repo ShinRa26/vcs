@@ -2,12 +2,12 @@ module controls.initControl;
 
 import std.file;
 import std.path;
-import vcs.utils;
+import dvcs.utils;
 import std.stdio;
 import std.format : format;
 
-const string vcsConfig = ".vcsConfig";
-const string vcsIgnore = ".vcsIgnore";
+const string dvcsConfig = ".dvcsConfig";
+const string dvcsIgnore = ".dvcsIgnore";
 
 void initDirectory(string[] args) {
     string directory = args[0];
@@ -20,15 +20,15 @@ void initDirectory(string[] args) {
 }
 
 void checkForInitDirectory(string directory) {
-    string dirCheck = buildPath(directory, ".vcs");
+    string dirCheck = buildPath(directory, ".dvcs");
     try {
         if(isDir(dirCheck)) {
-            auto msg = format!".vcs directory already exists in this location: \"%s\""(dirCheck);
-            VCSMessage(msg);
+            auto msg = format!".dvcs directory already exists in this location: \"%s\""(dirCheck);
+            DVCSMessage(msg);
         }
     } catch(FileException e) {
-        auto msg = format!"Initialised VCS repository at \"%s\""(dirCheck);
-        VCSMessage(msg);
+        auto msg = format!"Initialised DVCS repository at \"%s\""(dirCheck);
+        DVCSMessage(msg);
         dirCheck.mkdir;
 
         createConfigFile(directory, dirCheck);
@@ -36,20 +36,20 @@ void checkForInitDirectory(string directory) {
     }
 }
 
-void createConfigFile(string targetDir, string vcsPath) {
-    auto savePath = buildPath(targetDir, vcsConfig);
+void createConfigFile(string targetDir, string dvcsPath) {
+    auto savePath = buildPath(targetDir, dvcsConfig);
     auto f = File(savePath, "w");
-    f.writef("[VCSPath] -- %s", vcsPath);
+    f.writef("[DVCSPath] -- %s\n", dvcsPath);
 
     auto msg = format!"Written config file at \"%s\""(savePath);
-    VCSMessage(msg);
+    DVCSMessage(msg);
 }
 
 void createIgnoreFile(string targetDir) {
-    auto savePath = buildPath(targetDir, vcsIgnore);
+    auto savePath = buildPath(targetDir, dvcsIgnore);
     auto f = File(savePath, "w");
     f.write("");
     
     auto msg = format!"Created ignore file at \"%s\""(savePath);
-    VCSMessage(msg);
+    DVCSMessage(msg);
 }

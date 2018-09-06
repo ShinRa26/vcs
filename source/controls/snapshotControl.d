@@ -5,7 +5,8 @@ import std.file;
 import std.path;
 import std.format : format;
 import std.string : endsWith, split;
-import std.algorithm : canFind, find;
+import std.algorithm : canFind, find, sort;
+import std.datetime.systime : SysTime, Clock;
 
 /// Custom modules
 import dvcs.utils;
@@ -89,8 +90,29 @@ struct Snapshot {
         writeToConfig(this.configFile, commitID);
     }
 
+    /**
+    * Get the last commit and compare the current state of the project to that.
+    * Update files if necessary
+    * Issue: If last commit has less changes than the current, that might cause a problem...
+    */
     bool contentChanged() {
+        SysTime[] modTimes = getModifiedCommitTimes();
+
+        DVCSMessage(modTimes[0].toString());
         return false;
+    }
+
+    SysTime[] getModifiedCommitTimes() {
+        auto currTime = Clock.currTime();
+        SysTime[] modTimes;
+        foreach(string dir; dirEntries(this.rootDir, SpanMode.breadth)) {
+            if(isDir(dir)) {
+                modTimes ~= timeLastModified(dir);
+            }
+        }
+        modTimes.sort!("a > b");
+
+        return modTimes;
     }
 
     /**

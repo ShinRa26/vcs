@@ -22,7 +22,6 @@ struct DVCSFile {
             this.contents = null;
         } else {
             this.contents = zLibCompressAndEncode();
-            string x;
         }
     }
 

@@ -130,4 +130,8 @@ void debugSystem() {
     DVCSMessage("Initialising debug", 1);
     DVCSMessage(path, 1);
 }
+
+bool emptyArgCheck(string[] args) {
+    return args.length == 0;
+}
 /* Other Utilities if I can be arsed */

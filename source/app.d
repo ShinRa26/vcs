@@ -7,7 +7,7 @@ void parseArguments(string[] cmdLineArgs) {
     
     switch(initialArg) {
         case "init":
-			import controls.initControl;
+			import controls.init;
             initDirectory(cmdLineArgs[1..$]);
             break;
         case "snap":

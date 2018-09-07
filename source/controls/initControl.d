@@ -1,4 +1,4 @@
-module controls.initControl;
+module controls.init;
 
 import std.file;
 import std.path;

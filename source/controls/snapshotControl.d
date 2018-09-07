@@ -33,6 +33,11 @@ struct Snapshot {
     }
     
     void parseArgs() {
+        if(emptyArgCheck(this.args)) {
+            DVCSMessage("Pass in files or directory to snapshot!");
+            return;
+        }
+        
         switch(this.args[0]) {
             case ".":
                 /// Current Directory downwards
@@ -150,39 +155,4 @@ struct Snapshot {
         modTimes.sort!("a > b");
         return commits[modTimes[0]];
     }
-
-    /**
-    * Needs reworked.
-    * Commits fine but duplicate commits a file that has already been committed if change is detected.
-    * TODO::Rework
-    */
-    // bool contentChanged() {                                                                                                        
-    //     int pathCounter;
-    //     DVCSFile[] newStage;
-    //     DVCSMessage("Checking for content changes...");
-
-    //     foreach(string path; dirEntries(this.rootDir, SpanMode.depth)) {
-    //         if(isFile(path)) {
-    //             string content = cast(string)read(path);
-    //             string originalName = content.split("\n\n")[0].split(": ")[1];
-                
-    //             foreach(DVCSFile f; this.stage) {
-    //                 if(f.filename == originalName && f.shaContents != baseName(path)) {
-    //                     newStage ~= f;
-    //                     break;            
-    //                 }
-    //             }
-    //         }
-    //         pathCounter++;
-    //     }
-
-    //     if(newStage.length != 0) {
-    //         this.stage = newStage;
-    //         return true;
-    //     } else if(pathCounter == 0){
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
 }

@@ -96,23 +96,59 @@ struct Snapshot {
     * Issue: If last commit has less changes than the current, that might cause a problem...
     */
     bool contentChanged() {
-        SysTime[] modTimes = getModifiedCommitTimes();
+        size_t pathCounter;
+        DVCSFile[] newStage;
+        string lastCommit = getLastCommit();
 
-        DVCSMessage(modTimes[0].toString());
-        return false;
+        if(lastCommit == "") {
+            return true;
+        }
+
+        foreach(string commitFile; dirEntries(lastCommit, SpanMode.depth)) {
+            if(isFile(commitFile)) {
+                string content = cast(string)read(commitFile);
+                string originalName = content.split("\n\n")[0].split(": ")[1];
+
+                foreach(DVCSFile f; this.stage) {
+                    if(f.filename == originalName && f.shaContents != baseName(commitFile)) {
+                        newStage ~= f;
+                        break;
+                    }
+                }
+            }
+
+            pathCounter++;
+        }
+
+        if(newStage.length != 0) {
+            this.stage = newStage;
+            return true;
+        } else if(pathCounter == 0) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
-    SysTime[] getModifiedCommitTimes() {
+    string getLastCommit() {
+        string[SysTime] commits;
         auto currTime = Clock.currTime();
-        SysTime[] modTimes;
+
         foreach(string dir; dirEntries(this.rootDir, SpanMode.breadth)) {
             if(isDir(dir)) {
-                modTimes ~= timeLastModified(dir);
+                commits[timeLastModified(dir)] = dir;
             }
         }
-        modTimes.sort!("a > b");
 
-        return modTimes;
+        SysTime[] modTimes = commits.keys;
+        if(modTimes.length == 0) {
+            return "";
+        }
+
+
+        modTimes.sort!("a > b");
+        return commits[modTimes[0]];
     }
 
     /**

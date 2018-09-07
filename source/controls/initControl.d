@@ -41,6 +41,7 @@ void createConfigFile(string targetDir, string dvcsPath) {
     auto f = File(savePath, "w");
     f.writef("[DVCSPath] -- %s\n", dvcsPath);
 
+    /// Test comment
     auto msg = format!"Written config file at \"%s\""(savePath);
     DVCSMessage(msg);
 }

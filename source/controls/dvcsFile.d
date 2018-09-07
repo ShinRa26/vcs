@@ -26,6 +26,7 @@ struct DVCSFile {
         }
     }
 
+    /// Test comment
     ubyte[] zLibCompressAndEncode() {
         ubyte[] data = cast(ubyte[])std.file.read(this.filename);
         

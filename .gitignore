@@ -13,6 +13,7 @@ dvcs-test-*
 *.obj
 *.lst
 
+test/
 dvcs
 .dvcs/
 .dvcsConfig

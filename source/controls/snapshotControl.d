@@ -99,6 +99,10 @@ struct Snapshot {
     * Get the last commit and compare the current state of the project to that.
     * Update files if necessary
     * Issue: If last commit has less changes than the current, that might cause a problem...
+    *
+    * INHERINTLY FLAWED -- CHANGES ARENT NECESSARY
+    * FILES THAT HAVE CHANGED BUT NOT IN THE PREVIOUS COMMIT ARENT RECOGNISED
+    * REMOVE -- JUST SNAPSHOT ENTIRE PROJECT AT ONCE
     */
     bool contentChanged() {
         size_t pathCounter;
@@ -116,9 +120,11 @@ struct Snapshot {
 
                 foreach(DVCSFile f; this.stage) {
                     if(f.filename == originalName && f.shaContents != baseName(commitFile)) {
+                        /// Bugs out here, need to check which files to add and which not to
                         newStage ~= f;
                         break;
                     }
+                    newStage ~= f;
                 }
             }
 

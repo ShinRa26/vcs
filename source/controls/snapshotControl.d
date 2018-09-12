@@ -75,7 +75,7 @@ struct Snapshot {
         /// Check for file changes 
         /// If allFiles set, don't check
         if(!this.allFiles) {
-            if(!contentChanged()) {
+            if(!detectChange()) {
                 DVCSMessage("No changes detected, nothing to commit.");
                 return;
             }
@@ -96,12 +96,11 @@ struct Snapshot {
     }
 
     /*
-    * Check for any change in the files
-    * If any changes detected, snapshot everything, else return
+    * This is dogshit, need to think!
+    * TODO::Change this
     */
     bool detectChange() {
         size_t pathCounter;
-        DVCSFile[] newStage;
 
         foreach(string commitFile; dirEntries(this.rootDir, SpanMode.depth)) {
             if(isDir(commitFile))
@@ -113,9 +112,21 @@ struct Snapshot {
 
             // Loop through each DVCSFile, comparing sha contents to commit file name
             foreach(DVCSFile f; this.stage) {
-                // Start here
+                // File matches, add it to the new stage
+                if(f.filename == originalLocation && f.shaContents != baseName(commitFile)) {
+                    // Change detected, snapshot EVERYTHING!
+                    return true;
+                }
             }
         }
+
+        // No previous commits, add all changes
+        if(pathCounter == 0) {
+            return true;
+        }
+
+        // No changes detected, ignore everything
+        return false;
     }
 
     /*

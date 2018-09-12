@@ -66,7 +66,13 @@ void writeToConfig(string configFilename, string tag, string msg = "") {
 }
 
 string[] parseIgnoreFile(string path) {
-    string content = cast(string)read(path);
+    string content;
+
+    try {
+        content = cast(string)read(path);
+    } catch(Exception) {
+        return null;
+    }
 
     version(Windows) {
         return content.split("\r\n");
@@ -78,6 +84,9 @@ string[] parseIgnoreFile(string path) {
 
 bool toIgnore(string ignoreFile, string toCheck) {
     string[] ignoreList = parseIgnoreFile(ignoreFile);
+    if(ignoreList is null) {
+        return false;
+    }
 
     /// Search for matches
     foreach(string ignore; ignoreList) {

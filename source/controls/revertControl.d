@@ -38,7 +38,6 @@ struct Revert {
 
             string fileContents = decodeContent(fileData);
             writeFile(savePath, fileContents);
-            
         }
     }
 

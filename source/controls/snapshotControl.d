@@ -95,52 +95,70 @@ struct Snapshot {
         writeToConfig(this.configFile, commitID);
     }
 
-    /**
-    * Get the last commit and compare the current state of the project to that.
-    * Update files if necessary
-    * Issue: If last commit has less changes than the current, that might cause a problem...
-    *
-    * INHERINTLY FLAWED -- CHANGES ARENT NECESSARY
-    * FILES THAT HAVE CHANGED BUT NOT IN THE PREVIOUS COMMIT ARENT RECOGNISED
-    * REMOVE -- JUST SNAPSHOT ENTIRE PROJECT AT ONCE
+    /*
+    * Check for any change in the files
+    * If any changes detected, snapshot everything, else return
     */
-    bool contentChanged() {
+    bool detectChange() {
         size_t pathCounter;
         DVCSFile[] newStage;
-        string lastCommit = getLastCommit();
 
-        if(lastCommit == "") {
-            return true;
-        }
+        foreach(string commitFile; dirEntries(this.rootDir, SpanMode.depth)) {
+            if(isDir(commitFile))
+                continue; // Directories, skip these
 
-        foreach(string commitFile; dirEntries(lastCommit, SpanMode.depth)) {
-            if(isFile(commitFile)) {
-                string content = cast(string)read(commitFile);
-                string originalName = content.split("\n\n")[0].split(": ")[1];
+            // Read file contents and get the original location of the file
+            string content = cast(string)read(commitFile);
+            string originalLocation = content.split("\n\n")[0].split(": ")[1];
 
-                foreach(DVCSFile f; this.stage) {
-                    if(f.filename == originalName && f.shaContents != baseName(commitFile)) {
-                        /// Bugs out here, need to check which files to add and which not to
-                        newStage ~= f;
-                        break;
-                    }
-                    newStage ~= f;
-                }
+            // Loop through each DVCSFile, comparing sha contents to commit file name
+            foreach(DVCSFile f; this.stage) {
+                // Start here
             }
-
-            pathCounter++;
         }
-
-        if(newStage.length != 0) {
-            this.stage = newStage;
-            return true;
-        } else if(pathCounter == 0) {
-            return true;
-        } else {
-            return false;
-        }
-
     }
+
+    /*
+    * Just check for no changes at all
+    * If any change detected, snapshot whole project again
+    */
+    // bool contentChanged() {
+    //     size_t pathCounter;
+    //     DVCSFile[] newStage;
+    //     string lastCommit = getLastCommit();
+
+    //     if(lastCommit == "") {
+    //         return true;
+    //     }
+
+    //     foreach(string commitFile; dirEntries(lastCommit, SpanMode.depth)) {
+    //         if(isFile(commitFile)) {
+    //             string content = cast(string)read(commitFile);
+    //             string originalName = content.split("\n\n")[0].split(": ")[1];
+
+    //             foreach(DVCSFile f; this.stage) {
+    //                 if(f.filename == originalName && f.shaContents != baseName(commitFile)) {
+    //                     /// Bugs out here, need to check which files to add and which not to
+    //                     newStage ~= f;
+    //                     break;
+    //                 }
+    //                 newStage ~= f;
+    //             }
+    //         }
+
+    //         pathCounter++;
+    //     }
+
+    //     if(newStage.length != 0) {
+    //         this.stage = newStage;
+    //         return true;
+    //     } else if(pathCounter == 0) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+
+    // }
 
     string getLastCommit() {
         string[SysTime] commits;

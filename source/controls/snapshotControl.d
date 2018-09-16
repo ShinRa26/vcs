@@ -48,10 +48,28 @@ struct Snapshot {
                 this.allFiles = true;
                 fromDirectory(dirName(this.rootDir));
                 break;
+            case "-f":
+                // INdividual files
+                individualFiles(this.args[1..$]);
+                break;
             default:
-                /// Individual files
                 break;
         }
+    }
+
+    /// TODO::Create absolute path for each file
+    void individualFiles(string[] args) {
+        foreach(string f; args) {
+            if(toIgnore(this.ignoreFile, f)) {
+                continue;
+            }
+
+            if(isFile(f)) {
+                this.stage ~= DVCSFile(f);
+            }
+        }
+
+        writeCommit();
     }
 
     void fromDirectory(string directory) {
@@ -96,37 +114,39 @@ struct Snapshot {
     }
 
     /*
-    * This is dogshit, need to think!
-    * TODO::Change this
+    * This might work maybe
     */
     bool detectChange() {
-        size_t pathCounter;
+        string[] unchanged;
 
+        // Check all previous commits
         foreach(string commitFile; dirEntries(this.rootDir, SpanMode.depth)) {
-            if(isDir(commitFile))
-                continue; // Directories, skip these
+            // Skip if a directory
+            if(isDir(commitFile)) {
+                continue;
+            }
 
-            // Read file contents and get the original location of the file
+            // Read the contents of the commit
             string content = cast(string)read(commitFile);
-            string originalLocation = content.split("\n\n")[0].split(": ")[1];
+            string originalName = content.split("\n\n")[0].split(": ")[1];
 
-            // Loop through each DVCSFile, comparing sha contents to commit file name
+            // Loop through each file in the stage
             foreach(DVCSFile f; this.stage) {
-                // File matches, add it to the new stage
-                if(f.filename == originalLocation && f.shaContents != baseName(commitFile)) {
-                    // Change detected, snapshot EVERYTHING!
-                    return true;
+                // If the stage file is a match for our current file, add it to the unchanged
+                if(f.filename == originalName && f.shaContents == baseName(commitFile)) {
+                    // Prevents multiple addition fo the same file
+                    if(!canFind(unchanged, f.filename))
+                        unchanged ~= f.filename;
                 }
             }
         }
 
-        // No previous commits, add all changes
-        if(pathCounter == 0) {
-            return true;
+        // No changes should result in the same size of unchaged and the current stage
+        if(unchanged.length == this.stage.length) {
+            return false;
         }
 
-        // No changes detected, ignore everything
-        return false;
+        return true;
     }
 
     /*

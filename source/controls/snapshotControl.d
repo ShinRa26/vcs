@@ -50,6 +50,7 @@ struct Snapshot {
                 break;
             case "-f":
                 // INdividual files
+                this.allFiles = true;
                 individualFiles(this.args[1..$]);
                 break;
             default:
@@ -147,67 +148,5 @@ struct Snapshot {
         }
 
         return true;
-    }
-
-    /*
-    * Just check for no changes at all
-    * If any change detected, snapshot whole project again
-    */
-    // bool contentChanged() {
-    //     size_t pathCounter;
-    //     DVCSFile[] newStage;
-    //     string lastCommit = getLastCommit();
-
-    //     if(lastCommit == "") {
-    //         return true;
-    //     }
-
-    //     foreach(string commitFile; dirEntries(lastCommit, SpanMode.depth)) {
-    //         if(isFile(commitFile)) {
-    //             string content = cast(string)read(commitFile);
-    //             string originalName = content.split("\n\n")[0].split(": ")[1];
-
-    //             foreach(DVCSFile f; this.stage) {
-    //                 if(f.filename == originalName && f.shaContents != baseName(commitFile)) {
-    //                     /// Bugs out here, need to check which files to add and which not to
-    //                     newStage ~= f;
-    //                     break;
-    //                 }
-    //                 newStage ~= f;
-    //             }
-    //         }
-
-    //         pathCounter++;
-    //     }
-
-    //     if(newStage.length != 0) {
-    //         this.stage = newStage;
-    //         return true;
-    //     } else if(pathCounter == 0) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-
-    // }
-
-    string getLastCommit() {
-        string[SysTime] commits;
-        auto currTime = Clock.currTime();
-
-        foreach(string dir; dirEntries(this.rootDir, SpanMode.breadth)) {
-            if(isDir(dir)) {
-                commits[timeLastModified(dir)] = dir;
-            }
-        }
-
-        SysTime[] modTimes = commits.keys;
-        if(modTimes.length == 0) {
-            return "";
-        }
-
-
-        modTimes.sort!("a > b");
-        return commits[modTimes[0]];
     }
 }

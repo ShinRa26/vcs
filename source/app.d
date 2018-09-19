@@ -16,6 +16,9 @@ void parseArguments(string[] cmdLineArgs) {
             snap.parseArgs();
             break;
         case "revert":
+            import controls.revert;
+            auto revert = Revert(cmdLineArgs[1..$]);
+            revert.revertToCommit();
             break;
         case "debug":
             debugSystem();

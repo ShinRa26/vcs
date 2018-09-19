@@ -38,6 +38,9 @@ struct Revert {
 
             string fileContents = decodeContent(fileData);
             writeFile(savePath, fileContents);
+
+            string msg = format!"Reverted project back to commit ID: %s"(commitID);
+            DVCSMessage(msg);
         }
     }
 
